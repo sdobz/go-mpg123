@@ -103,7 +103,23 @@ func (rsc *Mp3ReaderSeekerCloser) Read(p []byte) (int, error) {
 }
 
 func (rsc *Mp3ReaderSeekerCloser) Seek(offset int64, whence int) (int64, error) {
-	return 0, nil
+	c_offset := (C.off_t)(offset)
+	c_whence := (C.int)(whence)
+	s_offset := (int64)(C.mpg123_seek(rsc.handle, c_offset, c_whence))
+	return s_offset, nil
+}
+
+func (rsc *Mp3ReaderSeekerCloser) SeekFrame(offset int64, whence int) int64 {
+	c_offset := (C.off_t)(offset)
+	c_whence := (C.int)(whence)
+	s_offset := (int64)(C.mpg123_seek_frame(rsc.handle, c_offset, c_whence))
+	return s_offset
+}
+
+func (rsc *Mp3ReaderSeekerCloser) Timeframe(seconds int64) int64 {
+	c_seconds := (C.double)(seconds)
+	s_offset := (int64)(C.mpg123_timeframe(rsc.handle, c_seconds))
+	return s_offset
 }
 
 func (rsc *Mp3ReaderSeekerCloser) Close() error {
